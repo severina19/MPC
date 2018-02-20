@@ -105,7 +105,7 @@ class FG_eval {
       fg[1 + cte_start + t] =
             cte1 - ((f0 - y0) + (v0 * CppAD::sin(epsi0) * dt));
       fg[1 + epsi_start + t] =
-            epsi1 - ((psi0 - psides0) + v0 - delta0 / Lf * dt);
+            epsi1 - ((psi0 - psides0) - v0 * delta0 / Lf * dt);
       }
   }
 };
@@ -139,26 +139,9 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   for (int i = 0; i < n_vars; i++) {
     vars[i] = 0;
   }
-
-  vars[x_start] = x;
-  vars[y_start] = y;
-  vars[psi_start] = psi;
-  vars[v_start] = v;
-  vars[cte_start] = cte;
-  vars[epsi_start] = epsi;
-
   Dvector vars_lowerbound(n_vars);
   Dvector vars_upperbound(n_vars);
   // TODO: Set lower and upper limits for variables.
-
-  // Lower and upper limits for the constraints
-  // Should be 0 besides initial state.
-  Dvector constraints_lowerbound(n_constraints);
-  Dvector constraints_upperbound(n_constraints);
-  for (int i = 0; i < n_constraints; i++) {
-    constraints_lowerbound[i] = 0;
-    constraints_upperbound[i] = 0;
-  }
 
   for ( int i = 0; i < delta_start; i++ ) {
     vars_lowerbound[i] = -1.0e19;
@@ -173,6 +156,15 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
       vars_lowerbound[i] = -1;
       vars_upperbound[i] = 1;
     }
+
+  // Lower and upper limits for the constraints
+  // Should be 0 besides initial state.
+  Dvector constraints_lowerbound(n_constraints);
+  Dvector constraints_upperbound(n_constraints);
+  for (int i = 0; i < n_constraints; i++) {
+    constraints_lowerbound[i] = 0;
+    constraints_upperbound[i] = 0;
+  }
 
   constraints_lowerbound[x_start] = x;
   constraints_lowerbound[y_start] = y;
