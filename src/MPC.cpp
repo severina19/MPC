@@ -7,7 +7,7 @@ using CppAD::AD;
 
 // Set the timestep length and duration
 size_t N = 25;
-double dt = 0.25;
+double dt = 0.1;
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -21,13 +21,15 @@ double dt = 0.25;
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
 int x_start = 0;
-int y_start = N;
-int psi_start = 2*N;
-int v_start = 3*N;
-int cte_start = 4*N;
-int epsi_start = 5*N;
-int delta_start = 6*N;
-int a_start =7*N;
+int y_start = x_start + N;
+int psi_start = y_start + N;
+int v_start = psi_start + N;
+int cte_start = v_stNart + N;
+int epsi_start = cte_start + N;
+int delta_start = epsi_start+ ;
+int a_start =delta_start + N - 1;
+
+double ref_v=10;
 
 // Evaluate a polynomial.
 double polyeval(Eigen::VectorXd coeffs, double x) {
@@ -47,8 +49,6 @@ class FG_eval {
   typedef CPPAD_TESTVECTOR(AD<double>) ADvector;
   void operator()(ADvector& fg, const ADvector& vars) {      
     // `fg` a vector of the cost constraints, `vars` is a vector of variable values (state & actuators)
-    double ref_v=5;
-
     fg[0] = 0;
     // The part of the cost based on the reference state.
     for (int t = 0; t < N; t++) {
@@ -100,12 +100,12 @@ class FG_eval {
 
       fg[1 + x_start + t] = x1 - (x0 + v0 * CppAD::cos(psi0) * dt);
       fg[1 + y_start + t] = y1 - (y0 + v0 * CppAD::sin(psi0) * dt);
-      fg[1 + psi_start + t] = psi1 - (psi0 + v0 * delta0 / Lf * dt);
+      fg[1 + psi_start + t] = psi1 - (psi0 - v0 * delta0 / Lf * dt);
       fg[1 + v_start + t] = v1 - (v0 + a0 * dt);
       fg[1 + cte_start + t] =
             cte1 - ((f0 - y0) + (v0 * CppAD::sin(epsi0) * dt));
       fg[1 + epsi_start + t] =
-            epsi1 - ((psi0 - psides0) + v0 * delta0 / Lf * dt);
+            epsi1 - ((psi0 - psides0) + v0 - delta0 / Lf * dt);
       }
   }
 };
@@ -119,7 +119,7 @@ MPC::~MPC() {}
 vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   bool ok = true;
   size_t i;
-  int n_state = 5;
+  int n_state = 6;
   int n_input = 2;
   typedef CPPAD_TESTVECTOR(double) Dvector;
   double x = state[0];
@@ -137,7 +137,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // 4 * 10 + 2 * 9
   size_t n_vars = n_state*N+n_input*(N-1);
   // TODO: Set the number of constraints
-  size_t n_constraints = 6;
+  size_t n_constraints = 6 * N;
 
   // Initial value of the independent variables.
   // SHOULD BE 0 besides initial state.
@@ -166,19 +166,33 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     constraints_upperbound[i] = 0;
   }
 
-  for (int i = y_start; i < psi_start; i++) {
-      vars_lowerbound[i] = -5;
-      vars_upperbound[i] = 5;
-    }
+  for ( int i = 0; i < delta_start; i++ ) {
+    vars_lowerbound[i] = -1.0e19;
+    vars_upperbound[i] = 1.0e19;
+  }
 
   for (int i = delta_start; i < a_start; i++) {
       vars_lowerbound[i] = -0.436332;
       vars_upperbound[i] = 0.436332;
     }
-  for (int i = a_start; i < 8*N; i++) {
+  for (int i = a_start; i < n_vars; i++) {
       vars_lowerbound[i] = -1;
       vars_upperbound[i] = 1;
     }
+
+  constraints_lowerbound[x_start] = x;
+  constraints_lowerbound[y_start] = y;
+  constraints_lowerbound[psi_start] = psi;
+  constraints_lowerbound[v_start] = v;
+  constraints_lowerbound[cte_start] = cte;
+  constraints_lowerbound[epsi_start] = epsi;
+
+  constraints_upperbound[x_start] = x;
+  constraints_upperbound[y_start] = y;
+  constraints_upperbound[psi_start] = psi;
+  constraints_upperbound[v_start] = v;
+  constraints_upperbound[cte_start] = cte;
+  constraints_upperbound[epsi_start] = epsi;
 
   // object that computes objective and constraints
   FG_eval fg_eval(coeffs);
