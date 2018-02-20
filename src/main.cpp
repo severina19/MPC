@@ -101,7 +101,6 @@ int main() {
           Eigen::VectorXd x0;
           vector<double> opt_input;
           x0<<px,py,psi,v;
-          std::vector<double> v(4, 100.0);
           double* ptrx = &ptsx[0];
           double* ptry = &ptsy[0];
           Eigen::Map<Eigen::VectorXd> my_x(ptrx, 1);
