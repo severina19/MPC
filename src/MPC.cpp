@@ -29,7 +29,7 @@ const int epsi_start = cte_start + N;
 const int delta_start = epsi_start+ N;
 const int a_start =delta_start + N - 1;
 
-const double ref_v=100;
+const double ref_v=50;
 
 // Evaluate a polynomial.
 double polyeval(Eigen::VectorXd coeffs, double x) {
@@ -52,8 +52,8 @@ class FG_eval {
     fg[0] = 0;
     // The part of the cost based on the reference state.
     for (int t = 0; t < N; t++) {
-     fg[0] += 1000*CppAD::pow(vars[cte_start + t], 2);
-     fg[0] += 1000*CppAD::pow(vars[epsi_start + t], 2);
+     fg[0] += 1500*CppAD::pow(vars[cte_start + t], 2);
+     fg[0] += 1500*CppAD::pow(vars[epsi_start + t], 2);
      fg[0] += CppAD::pow(vars[v_start + t] - ref_v, 2);
     }
 
