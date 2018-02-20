@@ -101,10 +101,15 @@ int main() {
           Eigen::VectorXd x0;
           vector<double> opt_input;
           x0<<px,py,psi,v;
-          auto coeffs = polyfit(ptsx, ptsy, 3);
+          std::vector<double> v(4, 100.0);
+          double* ptrx = &ptsx[0];
+          double* ptry = &ptsy[0];
+          Eigen::Map<Eigen::VectorXd> my_x(ptrx, 1);
+          Eigen::Map<Eigen::VectorXd> my_y(ptry, 1);
+          auto coeffs = polyfit(my_x, my_y, 3);
           opt_input=mpc.Solve(x0,coeffs);
-          double steer_value=optinput[0];
-          double throttle_value=optinput[0];
+          double steer_value=opt_input[0];
+          double throttle_value=opt_input[0];
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
