@@ -18,4 +18,6 @@ class MPC {
   vector<double> Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs);
 };
 
+double polyeval(Eigen::VectorXd coeffs, double x);
+
 #endif /* MPC_H */

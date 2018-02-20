@@ -120,7 +120,8 @@ int main() {
           double cte_pred = cte0 + ( v * sin(epsi0) * delay );
           double epsi_pred = epsi0 - ( v * atan(coeffs[1]) * delay / mpc.Lf );
 
-          Eigen::VectorXd state_init<<x_pred, y_pred, psi_pred, v_pred, cte_pred, epsi_pred;
+          Eigen::VectorXd state_init;
+          state_init<<x_pred, y_pred, psi_pred, v_pred, cte_pred, epsi_pred;
 
           auto opt_input=mpc.Solve(state_init,coeffs);
           double steer_value=opt_input[0]/deg2rad(25);
@@ -143,7 +144,7 @@ int main() {
           msgJson["mpc_y"] = mpc_y_vals;
 
           //to display the predicted path
-          for ( int i = 2; i < vars.size(); i++ ) {
+          for ( int i = 2; i < opt_input.size(); i++ ) {
             if ( i % 2 == 0 ) {
               mpc_x_vals.push_back( vars[i] );
             } else {
