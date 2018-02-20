@@ -29,7 +29,7 @@ const int epsi_start = cte_start + N;
 const int delta_start = epsi_start+ N;
 const int a_start =delta_start + N - 1;
 
-const double ref_v=50;
+const double ref_v=80;
 
 // Evaluate a polynomial.
 double polyeval(Eigen::VectorXd coeffs, double x) {
