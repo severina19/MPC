@@ -29,6 +29,15 @@ int epsi_start = 5*N;
 int delta_start = 6*N;
 int a_start =7*N;
 
+// Evaluate a polynomial.
+double polyeval(Eigen::VectorXd coeffs, double x) {
+  double result = 0.0;
+  for (int i = 0; i < coeffs.size(); i++) {
+    result += coeffs[i] * pow(x, i);
+  }
+  return result;
+}
+
 class FG_eval {
  public:
   // Fitted polynomial coefficients
@@ -38,6 +47,7 @@ class FG_eval {
   typedef CPPAD_TESTVECTOR(AD<double>) ADvector;
   void operator()(ADvector& fg, const ADvector& vars) {
     // TODO: implement MPC
+    double ref_v=5;
 
     fg[0] = 0;
     // The part of the cost based on the reference state.
@@ -205,5 +215,5 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   //
   // {...} is shorthand for creating a vector, so auto x1 = {1.0,2.0}
   // creates a 2 element double vector.
-  return {solution.x};
+  return {solution.x[0],solution.x[1]};
 }
