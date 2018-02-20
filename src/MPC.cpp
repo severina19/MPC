@@ -6,7 +6,7 @@
 using CppAD::AD;
 
 // Set the timestep length and duration
-size_t N = 25;
+size_t N = 10;
 double dt = 0.1;
 
 // This value assumes the model presented in the classroom is used.
@@ -52,21 +52,21 @@ class FG_eval {
     fg[0] = 0;
     // The part of the cost based on the reference state.
     for (int t = 0; t < N; t++) {
-     fg[0] += CppAD::pow(vars[cte_start + t], 2);
-     fg[0] += CppAD::pow(vars[epsi_start + t], 2);
+     fg[0] += 1000*CppAD::pow(vars[cte_start + t], 2);
+     fg[0] += 1000*CppAD::pow(vars[epsi_start + t], 2);
      fg[0] += CppAD::pow(vars[v_start + t] - ref_v, 2);
     }
 
     // Minimize the use of actuators.
     for (int t = 0; t < N - 1; t++) {
-     fg[0] += CppAD::pow(vars[delta_start + t], 2);
-     fg[0] += CppAD::pow(vars[a_start + t], 2);
+     fg[0] += 50*CppAD::pow(vars[delta_start + t], 2);
+     fg[0] += 50*CppAD::pow(vars[a_start + t], 2);
     }
 
     // Minimize the value gap between sequential actuations.
     for (int t = 0; t < N - 2; t++) {
-     fg[0] += CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
-     fg[0] += CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+     fg[0] += 10000*CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+     fg[0] += 50*CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
     fg[1 + x_start] = vars[x_start];
     fg[1 + y_start] = vars[y_start];
@@ -126,15 +126,9 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   double y = state[1];
   double psi = state[2];
   double v = state[3];
-  double cte = polyeval(coeffs, x) - y;
+  double cte = state[4];
   // calculate the orientation error
-  double epsi = psi - atan(coeffs[1]);
-
-  // TODO: Set the number of model variables (includes both states and inputs).
-  // For example: If the state is a 4 element vector, the actuators is a 2
-  // element vector and there are 10 timesteps. The number of variables is:
-  //
-  // 4 * 10 + 2 * 9
+  double epsi = state[5];
   size_t n_vars = n_state*N+n_input*(N-1);
   // TODO: Set the number of constraints
   size_t n_constraints = 6 * N;
@@ -172,8 +166,8 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   }
 
   for (int i = delta_start; i < a_start; i++) {
-      vars_lowerbound[i] = -0.436332;
-      vars_upperbound[i] = 0.436332;
+      vars_lowerbound[i] = -0.436332*Lf;
+      vars_upperbound[i] = 0.436332*Lf;
     }
   for (int i = a_start; i < n_vars; i++) {
       vars_lowerbound[i] = -1;

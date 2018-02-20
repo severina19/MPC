@@ -84,13 +84,6 @@ int main() {
           double v = j[1]["speed"];
           double delta= j[1]["steering_angle"];
           double a = j[1]["throttle"];
-
-          /*
-          * TODO: Calculate steering angle and throttle using MPC.
-          *
-          * Both are in between [-1, 1].
-          *
-          */
           double delay = 0.1;
           // transform coordinates from world to car coordinate
           int n_points = ptsx.size();
@@ -120,7 +113,7 @@ int main() {
           double cte_pred = cte0 + ( v * sin(epsi0) * delay );
           double epsi_pred = epsi0 - ( v * atan(coeffs[1]) * delay / mpc.Lf );
 
-          Eigen::VectorXd state_init;
+          Eigen::VectorXd state_init(6);
           state_init<<x_pred, y_pred, psi_pred, v_pred, cte_pred, epsi_pred;
 
           auto opt_input=mpc.Solve(state_init,coeffs);
