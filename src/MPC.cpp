@@ -24,9 +24,9 @@ int x_start = 0;
 int y_start = x_start + N;
 int psi_start = y_start + N;
 int v_start = psi_start + N;
-int cte_start = v_stNart + N;
+int cte_start = v_start + N;
 int epsi_start = cte_start + N;
-int delta_start = epsi_start+ ;
+int delta_start = epsi_start+ N;
 int a_start =delta_start + N - 1;
 
 double ref_v=10;
