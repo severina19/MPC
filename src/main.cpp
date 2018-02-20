@@ -146,9 +146,9 @@ int main() {
           //to display the predicted path
           for ( int i = 2; i < opt_input.size(); i++ ) {
             if ( i % 2 == 0 ) {
-              mpc_x_vals.push_back( vars[i] );
+              mpc_x_vals.push_back( opt_input[i] );
             } else {
-              mpc_y_vals.push_back( vars[i] );
+              mpc_y_vals.push_back( opt_input[i] );
             }
           }
           //Display the waypoints/reference line
