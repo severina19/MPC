@@ -118,7 +118,7 @@ int main() {
           double psi_pred = psi0 - ( v * delta * delay / mpc.Lf );
           double v_pred = v + a * delay;
           double cte_pred = cte0 + ( v * sin(epsi0) * delay );
-          double epsi_pred = epsi0 - ( v * atan(coeffs[1]) * delay / mpc.Lf )
+          double epsi_pred = epsi0 - ( v * atan(coeffs[1]) * delay / mpc.Lf );
 
           Eigen::VectorXd state_init<<x_pred, y_pred, psi_pred, v_pred, cte_pred, epsi_pred;
 
@@ -139,9 +139,17 @@ int main() {
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
 
-          msgJson["mpc_x"] = mpc_x_vals = ptsx;
-          msgJson["mpc_y"] = mpc_y_vals = ptsy;
+          msgJson["mpc_x"] = mpc_x_vals;
+          msgJson["mpc_y"] = mpc_y_vals;
 
+          //to display the predicted path
+          for ( int i = 2; i < vars.size(); i++ ) {
+            if ( i % 2 == 0 ) {
+              mpc_x_vals.push_back( vars[i] );
+            } else {
+              mpc_y_vals.push_back( vars[i] );
+            }
+          }
           //Display the waypoints/reference line
           vector<double> next_x_vals;
           vector<double> next_y_vals;
@@ -152,7 +160,12 @@ int main() {
           msgJson["next_x"] = next_x_vals;
           msgJson["next_y"] = next_y_vals;
 
-
+          int num_points = 20;
+          for ( int i = 0; i < num_points; i++ ) {
+            double x = 2*i;
+            next_x_vals.push_back(x);
+            next_y_vals.push_back( polyeval(coeffs, x) );
+          }
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           // Latency
