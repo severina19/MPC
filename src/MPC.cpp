@@ -6,8 +6,8 @@
 using CppAD::AD;
 
 // Set the timestep length and duration
-size_t N = 10;
-double dt = 0.1;
+const size_t N = 10;
+const double dt = 0.1;
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -20,16 +20,16 @@ double dt = 0.1;
 //
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
-int x_start = 0;
-int y_start = x_start + N;
-int psi_start = y_start + N;
-int v_start = psi_start + N;
-int cte_start = v_start + N;
-int epsi_start = cte_start + N;
-int delta_start = epsi_start+ N;
-int a_start =delta_start + N - 1;
+const int x_start = 0;
+const int y_start = x_start + N;
+const int psi_start = y_start + N;
+const int v_start = psi_start + N;
+const int cte_start = v_start + N;
+const int epsi_start = cte_start + N;
+const int delta_start = epsi_start+ N;
+const int a_start =delta_start + N - 1;
 
-double ref_v=100;
+const double ref_v=100;
 
 // Evaluate a polynomial.
 double polyeval(Eigen::VectorXd coeffs, double x) {

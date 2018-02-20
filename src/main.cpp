@@ -133,9 +133,6 @@ int main() {
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
 
-          msgJson["mpc_x"] = mpc_x_vals;
-          msgJson["mpc_y"] = mpc_y_vals;
-
           //to display the predicted path
           for ( int i = 2; i < opt_input.size(); i++ ) {
             if ( i % 2 == 0 ) {
@@ -144,6 +141,10 @@ int main() {
               mpc_y_vals.push_back( opt_input[i] );
             }
           }
+
+          msgJson["mpc_x"] = mpc_x_vals;
+          msgJson["mpc_y"] = mpc_y_vals;
+
           //Display the waypoints/reference line
           vector<double> next_x_vals;
           vector<double> next_y_vals;
@@ -151,15 +152,16 @@ int main() {
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
 
-          msgJson["next_x"] = next_x_vals;
-          msgJson["next_y"] = next_y_vals;
-
           int num_points = 20;
           for ( int i = 0; i < num_points; i++ ) {
             double x = 2*i;
             next_x_vals.push_back(x);
             next_y_vals.push_back( polyeval(coeffs, x) );
           }
+
+          msgJson["next_x"] = next_x_vals;
+          msgJson["next_y"] = next_y_vals;
+
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           // Latency
